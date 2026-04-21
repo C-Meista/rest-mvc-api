@@ -1,5 +1,5 @@
 <?php
-    require_once ROOT_DIR . "Model/System.php";
+    require_once ROOT_DIR . "Model/System.php"; //autoload
     class SystemController{
 
         /*
@@ -10,16 +10,16 @@
 
         */
 
-        public function showAllUsers(){
-            $users = User::getAllUsers();
-            echo json_encode($users);
+        public function getAll($tbl){
+            $items = System::getAllItems($tbl);
+            echo json_encode($items);
         }
-        public function showUser($id){
-            $user = User::getUser($id);
-            echo json_encode($user);
+        public function get($tbl,$id){
+            $item = System::getItem($tbl, $id);
+            echo json_encode($item);
         }
 
-        public function createUser(){
+        public function create($tbl){
             $data=json_decode(file_get_contents("php://input"),true);
 
             if (!isset($data["name"]) || !isset($data["surname"])) {
@@ -28,30 +28,30 @@
                 return;
             }
 
-            $user = User::create($data["name"], $data["surname"]);
+            $item = System::createItem($tbl, $data["name"], $data["surname"]);
 
             http_response_code(201);
 
-            echo json_encode($user);
+            echo json_encode($item);
         }
 
-        public function modifyUser($id){
-            $user=User::getUser($id);
+        public function modify($tbl, $id){
+            $item=System::getItem($tbl,$id);
             $data=json_decode(file_get_contents("php://input"), true);
             if(!isset($data["name"]) || !isset($data["surname"])){
                 http_response_code(204);
                 echo json_encode(["error" => "No content to modify"]);
                 return;
             }
-            User::modify($id,$data["name"],$data["surname"]);
+            System::modifyItem($tbl,$id,$data["name"],$data["surname"]);
             http_response_code(200);
-            echo json_encode($user);
+            echo json_encode($item);
         }
 
-        public function deleteUser($id){
-            User::delete($id);
+        public function delete($tbl,$id){
+            System::deleteItem($tbl, $id);
             http_response_code(200);
-            return json_encode(["message" => "User deleted!"]);
+            return json_encode(["message" => "Item deleted!"]);
         }
     }
 

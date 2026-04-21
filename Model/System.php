@@ -1,47 +1,68 @@
 
 <?php
-class User {
-    public static function getAllUsers() {
+class System {
+    public static function getAllItems($tbl) {
         $pdo = DB::$connection;
-        $stmt = $pdo->query("SELECT * FROM tbl_users");
+        //optional auslagern $sql
+        $sql = <<<SQL
+            SELECT *
+            FROM tbl_$tbl;
+        SQL;
+        $stmt = $pdo->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public static function getUser($id){
+    public static function getItem($tbl,$id){
         $pdo = DB::$connection;
-        $stmt = $pdo->prepare("SELECT * FROM tbl_users where u_id = :id");
+        $sql = <<<SQL
+            SELECT *
+            FROM tbl_$tbl
+            WHERE u_id=:id
+        SQL;
+        $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':id',$id,PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public static function create($name,$surname){
+    public static function createItem($tbl,$name,$surname){
         $pdo = DB::$connection;
-        $stmt = $pdo->prepare("INSERT INTO tbl_users (u_name, u_surname)VALUES (:name, :surname)");
+        $sql = <<<SQL
+            INSERT INTO tbl_$tbl (u_name, u_surname)
+            VALUES (:name,:surname)
+        SQL;
+        $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':name',$name,PDO::PARAM_STR);
         $stmt->bindParam(':surname',$surname,PDO::PARAM_STR);
         $stmt->execute();
-        return self::getUser($pdo->lastInsertId());
+        return self::getItem($tbl, $pdo->lastInsertId());
     }
 
-    public static function modify($id,$name,$surname){
+    public static function modifyItem($tbl,$id,$name,$surname){
         $pdo = DB::$connection;
-        $stmt = $pdo->prepare("UPDATE tbl_users set u_name=':name', u_surname=':surname' where u_id=':id'");
+        $sql = <<<SQL
+            UPDATE tbl_$tbl 
+            SET u_name=:name, u_surname=:surname
+            WHERE u_id=:id
+        SQL;
+        $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':name',$name,PDO::PARAM_STR);
         $stmt->bindParam(':surname',$surname,PDO::PARAM_STR);
         $stmt->bindParam(':id',$id,PDO::PARAM_INT);
         $stmt->execute();
-        return self::getUser($pdo->lastInsertId());
+        return self::getItem($tbl, $pdo->lastInsertId());
     }
 
-    public static function delete($id){
+    public static function deleteItem($tbl,$id){
         $pdo = DB::$connection;
-        $stmt = $pdo->prepare("DELETE from tbl_users where u_id=':id'");
+        $sql = <<<SQL
+            DELETE FROM tbl_$tbl 
+            WHERE u_id=:id
+        SQL;
+        $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':id',$id,PDO::PARAM_INT);
         $stmt->execute();
-        return self::getUser($pdo->lastInsertId());
-    }
-
-    
+        return self::getItem($tbl, $pdo->lastInsertId());
+    } 
 }
 ?>

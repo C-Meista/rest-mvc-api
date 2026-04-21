@@ -4,6 +4,8 @@ define('ROOT_DIR', __DIR__ . "/");
 require_once ROOT_DIR . "Controller/SystemController.php";
 require_once ROOT_DIR . "DB.php";
 
+//Require once etc. replacable with one method (see autoload)
+
 DB::connect();
 
 // wichtig
@@ -18,28 +20,30 @@ $params = explode('/', $uri);
 
 if ($method === 'GET') {
 
-    if ($params[0] == 'users' && count($params) < 2) {
-        $controller->showAllUsers();
-    } elseif ($params[0] == 'users' && count($params) == 2) {
-        $controller->showUser($params[1]);
+    //statische router klasse OPTIMIEREN ABFRAGEN (alto router etc)
+
+    if ($params[0] == 'users'||$params[0] == 'products' && count($params) < 2) {
+        $controller->getAll($params[0]);
+    } elseif ($params[0] == 'users'||$params[0] == 'products' && count($params) == 2) {
+        $controller->get($params[0],$params[1]);
     }
 
 } elseif ($method === 'POST') {
 
-    if ($params[0] == 'users' && count($params) < 2) {
-        $controller->createUser();
+    if ($params[0] == 'users'||$params[0] == 'products' && count($params) < 2) {
+        $controller->create($params[0]);
     }
 
 } elseif ($method === 'PUT') {
 
-    if ($params[0] == 'users' && count($params) == 2) {
-        $controller->modifyUser($params[1]);
+    if ($params[0] == 'users'||$params[0] == 'products' && count($params) == 2) {
+        $controller->modify($params[0], $params[1]);
     }
 
 } elseif ($method === 'DELETE') {
 
-    if ($params[0] == 'users' && count($params) == 2) {
-        $controller->deleteUser($params[1]);
+    if ($params[0] == 'users'||$params[0] == 'products' && count($params) == 2) {
+        $controller->delete($params[0], $params[1]);
     }
 
 } else {
