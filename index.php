@@ -1,7 +1,8 @@
 <?php
 define('ROOT_DIR', __DIR__ . "/");
 
-require_once ROOT_DIR . "Controller/SystemController.php";
+//alle 3
+require_once ROOT_DIR . "Controllers/Controller.php";
 require_once ROOT_DIR . "DB.php";
 
 //Require once etc. replacable with one method (see autoload)
@@ -14,7 +15,7 @@ header("Content-Type: application/json");
 $method = $_SERVER['REQUEST_METHOD'];
 $uri = substr($_SERVER['REQUEST_URI'], 1);
 
-$controller = new SystemController();
+$controller = new Controller();
 
 $params = explode('/', $uri);
 
