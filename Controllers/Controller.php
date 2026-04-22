@@ -14,6 +14,7 @@
             $items = Model::getAllItems($tbl);
             echo json_encode($items);
         }
+
         public function get($tbl,$id){
             $item = Model::getItem($tbl, $id);
             echo json_encode($item);
@@ -22,8 +23,8 @@
         public function create($tbl){
             $data=json_decode(file_get_contents("php://input"),true);
 
-            if(count($data)>2 && (str_contains($data,"name") && str_contains($data,"usage")&&str_contains($data,"price"))){
-                if (!isset($data["name"]) || !isset($data["usage"]) || !isset($data["price"])) {
+            if(count($data)>2 && (str_contains($data,"name") && str_contains($data,"usage")&&str_contains($data,"price"))){//auslagerbar (validation klasse)
+                if (!isset($data["name"]) || !isset($data["usage"]) || !isset($data["price"])) { //auslagerbar (validation klasse)
                     http_response_code(400);
                     echo json_encode(["error" => "Missing data"]);
                     return;
