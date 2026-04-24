@@ -5,8 +5,8 @@
         /*
             Zu adden: 
                 -validation:
-                    -id validation
-                    -name && surname validation
+                    -id validation (queryValidation.php in models)
+                    -name && surname validation (payloadValidation.php in controllers)
 
         */
 
@@ -21,26 +21,21 @@
         }
 
         public function create($tbl){
-            $data=json_decode(file_get_contents("php://input"),true);
 
-            if(count($data)>2 && (str_contains($data,"name") && str_contains($data,"usage")&&str_contains($data,"price"))){//auslagerbar (validation klasse)
-                if (!isset($data["name"]) || !isset($data["usage"]) || !isset($data["price"])) { //auslagerbar (validation klasse)
-                    http_response_code(400);
-                    echo json_encode(["error" => "Missing data"]);
-                    return;
-                }
+            //get data array
+            $payload=json_decode(file_get_contents("php://input"),true);
+            //ifs(validations -> später auslagern)
+            if(PayloadValidator::isProduct($payload)){//auslagerbar (validation klasse)  
+                //item needs json response from method.
+                $item = ProductController::createProduct($tbl, $payload);
 
-                $item = Model::createItem($tbl, $data["name"], $data["usage"], $data["price"]);
-
-                
-            }else if(count($data)<=2 &&(str_contains($data,"name") && str_contains($data,"surname"))){
-                if (!isset($data["name"]) || !isset($data["surname"])) {
-                    http_response_code(400);
-                    echo json_encode(["error" => "Missing data"]);
-                    return;
-                }
-                $item = Model::createItem($tbl, $data["name"], $data["surname"], null);
+            }else if(PayloadValidator::isProduct($payload)){
+               
+                $item = UserController::createUser($tbl, $payload);
+           
             }
+    
+            //checkItem -> in responsehandler.php 
 
             http_response_code(201);
 
@@ -49,23 +44,17 @@
 
         public function modify($tbl, $id){
             $item=Model::getItem($tbl,$id);
-            $data=json_decode(file_get_contents("php://input"), true);
-            if(count($data)>2 && (str_contains($data,"name") && str_contains($data,"usage")&&str_contains($data,"price"))){
-                if (!isset($data["name"]) || !isset($data["usage"]) || !isset($data["price"])) {
-                    http_response_code(400);
-                    echo json_encode(["error" => "No content to modify"]);
-                    return;
-                }
-                Model::modifyItem($tbl,$id,$data["name"],$data["usage"],$data["price"]);
-            }else if(count($data)<=2 &&(str_contains($data,"name") && str_contains($data,"surname"))){
+            $payload=json_decode(file_get_contents("php://input"), true);
 
-                if(!isset($data["name"]) || !isset($data["surname"])){
-                    http_response_code(204);
-                    echo json_encode(["error" => "No content to modify"]);
-                    return;
-                }
-                Model::modifyItem($tbl,$id,$data["name"],$data["surname"],null);
+            if(PayloadValidator::isProduct($payload)){
+                
+                ProductController::modifyProduct($tbl,$id,$payload);
+            
+            }else if(PayloadValidator::isUser($payload)){
+
+                UserController::modifyUser($tbl,$id,$payload);
             }
+
             http_response_code(200);
             echo json_encode($item);
         }
